@@ -1,4 +1,9 @@
-﻿[<EntryPoint>]
+﻿// TODO: Replace stack with list
+// TODO: Refactor (less bs string building, less nesting, etc.) (Where to initiate the store)
+// TODO: Write test scenarios for presentation
+// TODO:
+
+[<EntryPoint>]
 let main argv =
     printfn "Welcome to the FHTW Domain REPL!"
     printfn "Please enter your commands to interact with the system."
