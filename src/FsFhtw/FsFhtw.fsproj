@@ -8,7 +8,5 @@
     <Compile Include="Parser.fs" />
     <Compile Include="Repl.fs" />
     <Compile Include="Program.fs" />
-    <Compile Include="LoadItemsFromFile.fs" />
-    <Compile Include="Item.fs" />
   </ItemGroup>
 </Project>
