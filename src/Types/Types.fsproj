@@ -6,7 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Include="Item.fs" />
+      <Compile Include="DomainModels.fs" />
+      <Compile Include="MessageTypes.fs" />
     </ItemGroup>
 
 </Project>

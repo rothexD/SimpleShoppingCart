@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="LoadItemsFromFile.fs" />
+      <ProjectReference Include="..\Types\Types.fsproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Types\Types.fsproj" />
+      <Compile Include="LoadItemsFromFile.fs" />
     </ItemGroup>
 
 </Project>

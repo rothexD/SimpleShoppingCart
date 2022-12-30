@@ -7,6 +7,6 @@ let main argv =
 
     //example
     let items = LoadItemsFromFile.loadItemsFromFile ("ItemsInStore.txt")
-    let initialState = Domain.init ()
-    Repl.loop initialState
+    let cart = Domain.initCart()
+    Repl.loop cart
     0 // return an integer exit code

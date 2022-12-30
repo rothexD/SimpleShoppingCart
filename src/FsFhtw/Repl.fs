@@ -12,10 +12,11 @@ type State = Domain.State
 
 let read (input : string) =
     match input with
-    | Increment -> Domain.Increment |> DomainMessage
-    | Decrement -> Domain.Decrement |> DomainMessage
-    | IncrementBy v -> Domain.IncrementBy v |> DomainMessage
-    | DecrementBy v -> Domain.DecrementBy v |> DomainMessage
+    | Increment -> MessageTypes.Add |> DomainMessage
+    | Decrement -> MessageTypes.Remove |> DomainMessage
+    | IncrementBy v -> MessageTypes.Undo v |> DomainMessage
+    | DecrementBy v -> MessageTypes.SetQuantity v |> DomainMessage
+    | DecrementBy v -> MessageTypes.PrintStoreItems v |> DomainMessage
     | Help -> HelpRequested
     | ParseFailed  -> NotParsable input
 
