@@ -53,14 +53,20 @@ let updateCartState (cart: Cart) (update: State -> State): Cart =
     cart.States.Push newState
     cart
 
-let addToCart (cart: Cart) (item: Item) (quantity: decimal): Cart =
-    updateCartState cart (fun state -> addToState state item quantity)
+let addToCart (cart: Cart) (item: Option<Item>) (quantity: decimal): Cart =
+    match item with
+    |Some x -> updateCartState cart (fun state -> addToState state x quantity)
+    |None -> cart
 
-let removeFromCart (cart: Cart) (item: Item): Cart =
-    updateCartState cart (fun state -> removeFromState state item)
+let removeFromCart (cart: Cart) (item: Option<Item>): Cart =
+    match item with
+    |Some x ->  updateCartState cart (fun state -> removeFromState state x)
+    |None -> cart
 
-let setQuantityInCart (cart: Cart) (item: Item) (quantity: decimal): Cart =
-    updateCartState cart (fun state -> setQuantityInState state item quantity)
+let setQuantityInCart (cart: Cart) (item: Option<Item>) (quantity: decimal): Cart =
+    match item with
+    |Some x -> updateCartState cart (fun state -> setQuantityInState state x quantity)
+    |None -> cart
 
 let rec undoCartActions (cart: Cart) (steps: decimal): Cart =
     if cart.States.Count > 1 && steps > decimal 0
@@ -68,10 +74,10 @@ let rec undoCartActions (cart: Cart) (steps: decimal): Cart =
         else cart
 
 let printStoreItem (index: int) (item: Item) =
-    printf $"{index}\t {item.Name}\t {item.Price}"
+    printf $"{index}\t {item.Name}\t {item.Price} {Environment.NewLine}"
 
-let printItemsInStore(store: Store, cart: Cart): Cart =
-    printf "Index\t Name\t Price";
+let printItemsInStore(store: Store)(cart: Cart): Cart =
+    printf $"Index\t Name\t Price {Environment.NewLine}";
     store.Items |> List.iteri printStoreItem
     cart
 
@@ -84,16 +90,26 @@ let initCart(): Cart =
     }
 
 // Store functions
-let store = LoadItemsFromFile.loadItemsFromFile "ItemsInStore.txt"
+let store = {Items = LoadItemsFromFile.loadItemsFromFile "ItemsInStore.txt"}
 
-
-
+let GetItemByIndexerFromStore(index: int) : Option<Item> =
+    if store.Items.Length < index || index < 0
+    then
+       None
+    else
+       Some store.Items[index]
+let GetItemByIndexerFromCart (cart:Cart) (index: int) : Option<Item> =
+    if cart.States.Pop().Items.Count < index || index < 0
+    then
+       None
+    else
+        Some (List.ofSeq(cart.States.Pop().Items)[index]).Value.Item
 
 // Message processing functions
 let update (msg : Message) (cart : Cart) : Cart =
     match msg with
-    | Add x -> addToCart cart x.Item x.Quantity
-    | Remove x -> removeFromCart cart x.Item
-    | SetQuantity x -> setQuantityInCart cart x.Item x.Quantity
-    | Undo steps -> undoCartActions cart steps
+    | Add (x,y) -> addToCart cart (GetItemByIndexerFromStore x) (decimal y)
+    | Remove x -> removeFromCart cart (GetItemByIndexerFromCart cart x)
+    | SetQuantity (x,y) -> setQuantityInCart cart (GetItemByIndexerFromCart cart x) (decimal y)
+    | Undo steps -> undoCartActions cart (decimal steps)
     | PrintStoreItems -> printItemsInStore store cart

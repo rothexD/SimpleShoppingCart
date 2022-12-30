@@ -6,8 +6,8 @@ type Remove = { Item: Item; }
 type SetQuantity = { Item: Item; Quantity: decimal }
 
 type Message =
-    | Add of Add
-    | Remove of Remove
-    | SetQuantity of SetQuantity
-    | Undo of decimal
+    | Add of int * int
+    | Remove of int
+    | SetQuantity of int * int
+    | Undo of int
     | PrintStoreItems

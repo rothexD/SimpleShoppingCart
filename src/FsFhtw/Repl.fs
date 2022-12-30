@@ -1,34 +1,35 @@
 module Repl
 
 open System
+open DomainModels
 open Parser
 
 type Message =
-    | DomainMessage of Domain.Message
+    | DomainMessage of MessageTypes.Message
     | HelpRequested
     | NotParsable of string
 
-type State = Domain.State
+type State = DomainModels.Cart
 
 let read (input : string) =
     match input with
-    | Increment -> MessageTypes.Add |> DomainMessage
-    | Decrement -> MessageTypes.Remove |> DomainMessage
-    | IncrementBy v -> MessageTypes.Undo v |> DomainMessage
-    | DecrementBy v -> MessageTypes.SetQuantity v |> DomainMessage
-    | DecrementBy v -> MessageTypes.PrintStoreItems v |> DomainMessage
+    | AddToCart v -> MessageTypes.Add v |> DomainMessage
+    | RemoveFromCart v -> MessageTypes.Remove v |> DomainMessage
+    | SetQuantityInCart v -> MessageTypes.SetQuantity v  |> DomainMessage
+    | Undo v -> MessageTypes.Undo v |> DomainMessage
+    | ListStoreItems v -> MessageTypes.PrintStoreItems |> DomainMessage
     | Help -> HelpRequested
     | ParseFailed  -> NotParsable input
 
 open Microsoft.FSharp.Reflection
 
 let createHelpText () : string =
-    FSharpType.GetUnionCases typeof<Domain.Message>
+    FSharpType.GetUnionCases typeof<MessageTypes.Message >
     |> Array.map (fun case -> case.Name)
     |> Array.fold (fun prev curr -> prev + " " + curr) ""
     |> (fun s -> s.Trim() |> sprintf "Known commands are: %s")
 
-let evaluate (update : Domain.Message -> State -> State) (state : State) (msg : Message) =
+let evaluate (update : MessageTypes.Message -> State -> State) (state : State) (msg : Message) =
     match msg with
     | DomainMessage msg ->
         let newState = update msg state
@@ -48,7 +49,7 @@ let print (state : State, outputToPrint : string) =
 
     state
 
-let rec loop (state : State) =
+let rec loop (state : Cart) =
     Console.ReadLine()
     |> read
     |> evaluate Domain.update state

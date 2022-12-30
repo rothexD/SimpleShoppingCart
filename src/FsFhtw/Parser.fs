@@ -8,7 +8,7 @@ let safeEquals (it : string) (theOther : string) =
 [<Literal>]
 let HelpLabel = "Help"
 
-let (|AddToCart|RemoveFromCart|SetQuantityInCart|Undo|ListStoreItems|Help|ParseFailed|) (input : string) =
+let rec (|AddToCart|RemoveFromCart|SetQuantityInCart|Undo|ListStoreItems|Help|ParseFailed|) (input : string) =
     let tryParseInt (arg : string) valueConstructor =
         let (worked, arg') = Int32.TryParse arg
         if worked then valueConstructor arg' else ParseFailed
@@ -16,20 +16,18 @@ let (|AddToCart|RemoveFromCart|SetQuantityInCart|Undo|ListStoreItems|Help|ParseF
     let tryParseInt2 (arg1 : string) (arg2: string) valueConstructor =
         let (worked1, arg1') = Int32.TryParse arg1
         let (worked2, arg2') = Int32.TryParse arg2
-        if worked1 && worked2 then valueConstructor arg1' arg2' else ParseFailed
+        if worked1 && worked2 then valueConstructor (arg1',arg2') else ParseFailed
 
     let parts = input.Split(' ') |> List.ofArray
     match parts with
-    | [ verb; arg ] when safeEquals verb (nameof MessageTypes.Add) ->
-        tryParseInt arg (fun value -> AddToCart value)
+    | [ verb; arg; arg2 ] when safeEquals verb (nameof MessageTypes.Add) ->
+        tryParseInt2 arg arg2 (fun value-> AddToCart value)
     | [ verb; arg ] when safeEquals verb (nameof MessageTypes.Remove) ->
         tryParseInt arg (fun value -> RemoveFromCart value)
     | [ verb; arg; arg2 ] when safeEquals verb (nameof MessageTypes.SetQuantity) ->
-        tryParseInt2 arg arg2 (fun value1 value2 -> SetQuantityInCart (value1 value2))
-    | [ verb ] when safeEquals verb (nameof MessageTypes.Undo) -> Undo
+        tryParseInt2 arg arg2 (fun value-> SetQuantityInCart value)
+    | [ verb; arg ] when safeEquals verb (nameof MessageTypes.Undo) ->
+        tryParseInt arg (fun value -> Undo value)
     | [ verb ] when safeEquals verb HelpLabel -> Help
-    | [ verb; arg ] when safeEquals verb (nameof Domain.IncrementBy) ->
-        tryParseInt arg (fun value -> IncrementBy value)
-    | [ verb; arg ] when safeEquals verb (nameof Domain.DecrementBy) ->
-        tryParseInt arg (fun value -> DecrementBy value)
+    | [ verb ] when safeEquals verb (nameof MessageTypes.PrintStoreItems) -> ListStoreItems
     | _ -> ParseFailed

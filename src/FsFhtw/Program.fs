@@ -6,7 +6,6 @@ let main argv =
     printf "> "
 
     //example
-    let items = LoadItemsFromFile.loadItemsFromFile ("ItemsInStore.txt")
     let cart = Domain.initCart()
     Repl.loop cart
     0 // return an integer exit code
