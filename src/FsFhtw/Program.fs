@@ -5,6 +5,8 @@ let main argv =
     printfn "Press CTRL+C to stop the program."
     printf "> "
 
+    //example
+    let items = LoadItemsFromFile.loadItemsFromFile ("ItemsInStore.txt")
     let initialState = Domain.init ()
     Repl.loop initialState
     0 // return an integer exit code
