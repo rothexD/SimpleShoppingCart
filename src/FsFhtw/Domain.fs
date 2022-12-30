@@ -28,22 +28,18 @@ let removeFromState (state : State) (item : Item) : State =
         { Items = state.Items.Remove(item.Id); Sum = newSum}
 
 let setQuantityInState (state : State) (item: Item) (itemQuantity: decimal): State =
-    if state.Items.ContainsKey item.Id
-        then
-            let oldPriceForItemAndQuantity = state.Items[item.Id].Quantity * state.Items[item.Id].Item.Price
-            {
-                Items = state.Items |> Map.change item.Id (fun x ->
-                match x with
-                    | Some itemState -> Some { Item = item; Quantity =  itemQuantity }
-                    | None -> None)
-                Sum = state.Sum - oldPriceForItemAndQuantity + item.Price * itemQuantity;
-            }
+    if (itemQuantity <= decimal 0)
+    then removeFromState state item
     else
-       if itemQuantity > decimal 0
-            then
-                addToState state item itemQuantity
-            else
-                state
+        let oldItemPrice = state.Items[item.Id].Quantity * state.Items[item.Id].Item.Price
+        let newItemPrice = item.Price * itemQuantity;
+        {
+            Items = state.Items |> Map.change item.Id (fun x ->
+                match x with
+                    | Some _ -> Some { Item = item; Quantity =  itemQuantity }
+                    | None -> None)
+            Sum = state.Sum - oldItemPrice + newItemPrice;
+        }
 
 
 // Cart functions
@@ -70,11 +66,13 @@ let setQuantityInCart (cart: Cart) (item: Option<Item>) (quantity: decimal): Car
 
 let rec undoCartActions (cart: Cart) (steps: decimal): Cart =
     if cart.States.Count > 1 && steps > decimal 0
-        then undoCartActions cart (steps - decimal 1)
+        then
+            let _ = cart.States.Pop();
+            undoCartActions cart (steps - decimal 1)
         else cart
 
 let printStoreItem (index: int) (item: Item) =
-    printf $"{index}\t {item.Name}\t {item.Price} {Environment.NewLine}"
+    printf $"{index}\t {item.Name}\t {item.Price}$ {Environment.NewLine}"
 
 let printItemsInStore(store: Store)(cart: Cart): Cart =
     printf $"Index\t Name\t Price {Environment.NewLine}";
@@ -99,11 +97,11 @@ let GetItemByIndexerFromStore(index: int) : Option<Item> =
     else
        Some store.Items[index]
 let GetItemByIndexerFromCart (cart:Cart) (index: int) : Option<Item> =
-    if cart.States.Pop().Items.Count < index || index < 0
+    if cart.States.Peek().Items.Count <= index || index < 0
     then
        None
     else
-        Some (List.ofSeq(cart.States.Pop().Items)[index]).Value.Item
+        Some (List.ofSeq(cart.States.Peek().Items)[index]).Value.Item
 
 // Message processing functions
 let update (msg : Message) (cart : Cart) : Cart =

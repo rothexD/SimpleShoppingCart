@@ -9,8 +9,6 @@ type Message =
     | HelpRequested
     | NotParsable of string
 
-type State = DomainModels.Cart
-
 let read (input : string) =
     match input with
     | AddToCart v -> MessageTypes.Add v |> DomainMessage
@@ -29,21 +27,33 @@ let createHelpText () : string =
     |> Array.fold (fun prev curr -> prev + " " + curr) ""
     |> (fun s -> s.Trim() |> sprintf "Known commands are: %s")
 
-let evaluate (update : MessageTypes.Message -> State -> State) (state : State) (msg : Message) =
+
+let itemStateToString (state: ItemState) (index: int): string =
+    $"{index}\t{state.Item.Name}\t\t\t{state.Item.Price}$\t({state.Quantity}){Environment.NewLine}"
+
+let cartToString (cart: Cart): string =
+    let state = cart.States.Peek()
+    let headerLines = $"Index\tName\t\t\tPrice\tQuantity{Environment.NewLine}";
+    let strings = state.Items |> Map.toList |> List.mapi (fun index (_, itemState) -> itemStateToString itemState index)
+    let sumString = [$"Total: {state.Sum}$"]
+    String.Join(Environment.NewLine, (headerLines :: strings) @ sumString)
+
+let evaluate (update : MessageTypes.Message -> Cart -> Cart) (cart : Cart) (msg : Message) =
     match msg with
     | DomainMessage msg ->
-        let newState = update msg state
-        let message = sprintf "The message was %A. New state is %A" msg newState
-        (newState, message)
+        let newCart = update msg cart
+        let textToPrint = cartToString newCart
+        let message = $"{Environment.NewLine}{Environment.NewLine}The message was {msg}.{Environment.NewLine}Cart content: {Environment.NewLine}{textToPrint}"
+        (newCart, message)
     | HelpRequested ->
         let message = createHelpText ()
-        (state, message)
+        (cart, message)
     | NotParsable originalInput ->
         let message =
             sprintf """"%s" was not parsable. %s"""  originalInput "You can get information about known commands by typing \"Help\""
-        (state, message)
+        (cart, message)
 
-let print (state : State, outputToPrint : string) =
+let print (state : Cart, outputToPrint : string) =
     printfn "%s\n" outputToPrint
     printf "> "
 
