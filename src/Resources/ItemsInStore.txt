@@ -1,0 +1,15 @@
+05556592-5caa-4b6b-a3c8-e6e3555e6181;Apfel;0.3
+8be0fe92-b8b5-488a-b38d-0b05f663a194;Ein tolles Buch über Schnitzel;10
+07f5cd2e-74de-4ab5-a291-208a788f46ff;PeanutButterCookies;2.5
+7c6d6287-8933-42a1-ab9e-9622803bee4e;Käse 100g;1
+5a7669bd-9d3e-4530-b27e-3cfacc0aac00;Schinken 200g;1.2
+dc429160-4adf-4827-ad50-a9fb0f4a28f4;Taschenrechner;10
+1ddedc2b-4976-4da2-9f5b-12abe9fed518;F# ist einfach toll - Ein Beginners Guide zu F#;100
+22004548-f21e-47cd-9731-1a873062c18e;Milch 1L;0.4
+bec78d47-8bb1-4b21-aa50-2c4ca94f1270;Tiefkühl Pommes;2
+7a421f7f-5a62-44bc-be9e-09f08b6bac34;Taschentücher;1.4
+cda99211-3b90-4415-84cb-72e2d274f597;Duftkerze Vanille;6
+a9567953-f0dc-4b53-a40e-5a73aa4a9dcc;Kaugummi;1.5
+f8ad8ec5-faed-4149-99bb-7f5e37550048;Schachbrett + Figuren;40
+51491414-8acd-4b3b-8a63-5cb7009bb85b;Karamell 1Kg;10.5
+ed730224-b7de-4554-82ba-daa2764afcc6;Zucker 1Kg;8
