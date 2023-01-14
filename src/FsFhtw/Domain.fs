@@ -2,6 +2,7 @@ module Domain
 
 open System
 open System.Collections.Generic
+open System.Reflection.Metadata
 open DomainModels
 open MessageTypes
 open Microsoft.FSharp.Core
@@ -92,7 +93,12 @@ let initCart(): Cart =
 
 // Payment functions
 let checkout (cart: Cart): Cart =
-    failwith ""
+    {
+        States = cart.States;
+        CheckoutInProgress = true;
+        UserData = None;
+        Credentials = None;
+    }
 
 let enterPersonalDetails (cart: Cart) (name: string) (address: string) (email: string): Cart =
     failwith ""
