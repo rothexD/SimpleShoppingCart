@@ -93,6 +93,17 @@ let initCart(): Cart =
         Credentials = None;
     }
 
+// Funny string stuff
+let itemStateToString (state: ItemState) (index: int): string =
+    $"{index}\t{state.Item.Name}\t\t\t{state.Item.Price}$\t({state.Quantity}){Environment.NewLine}"
+
+let cartToString (cart: Cart): string =
+    let state = cart.States.Peek()
+    let headerLines = $"Index\tName\t\t\tPrice\tQuantity{Environment.NewLine}";
+    let strings = state.Items |> Map.toList |> List.mapi (fun index (_, itemState) -> itemStateToString itemState index)
+    let sumString = [$"Total: {state.Sum}$"]
+    String.Join(Environment.NewLine, (headerLines :: strings) @ sumString)
+
 // Payment functions
 let checkout (cart: Cart): Cart =
     {
@@ -129,20 +140,22 @@ let rec saveReceipt (cart: Cart): Guid =
     let itemList = cartState.Items |> Map.map (fun _ itemState ->
         $"{itemState.Item.Name} ({itemState.Quantity}): {itemState.Item.Price * itemState.Quantity}")
 
-    let itemListString = String.Join (Environment.NewLine, itemList.Values)
-    let receipt = itemListString + Environment.NewLine + $"Total: {cartState.Sum}"
-
     let shoppingId = Guid.NewGuid()
     let fileName = $"receipt-{shoppingId}.txt"
+    let shoppingIdString = $"{shoppingId}";
+    let itemListString = String.Join (Environment.NewLine, itemList.Values)
+    let receipt = shoppingIdString + Environment.NewLine + itemListString + Environment.NewLine + $"Total: {cartState.Sum}"
+
     File.WriteAllText (fileName, receipt)
     shoppingId;
 
 // credential A is either username or credit card number
 // credential B is either password or CVV
 let pay (cart: Cart) (credentialA: string) (credentialB: string): Cart =
-    let sum = cart.States.Peek().Sum;
     let shoppingId = saveReceipt cart
-    printf $""
+    printf $"Saved receipt, shopping id is {shoppingId}"
+    let cartString = cartToString(cart)
+    printf $"{cartString}";
     initCart()
 
 // Store functions
@@ -213,16 +226,6 @@ let VerifyPaymentIsValid (cart: Cart): bool =
         true
 
 // Message processing functions
-
-let itemStateToString (state: ItemState) (index: int): string =
-    $"{index}\t{state.Item.Name}\t\t\t{state.Item.Price}$\t({state.Quantity}){Environment.NewLine}"
-
-let cartToString (cart: Cart): string =
-    let state = cart.States.Peek()
-    let headerLines = $"Index\tName\t\t\tPrice\tQuantity{Environment.NewLine}";
-    let strings = state.Items |> Map.toList |> List.mapi (fun index (_, itemState) -> itemStateToString itemState index)
-    let sumString = [$"Total: {state.Sum}$"]
-    String.Join(Environment.NewLine, (headerLines :: strings) @ sumString)
 
 let PrintCart (cart : Cart) : Cart =
     printf $"{cartToString cart}"
