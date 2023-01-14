@@ -1,7 +1,4 @@
-﻿// TODO: Replace stack with list
-// TODO: Refactor (less bs string building, less nesting, etc.) (Where to initiate the store)
-// TODO: Write test scenarios for presentation
-// TODO:
+﻿open System.IO
 
 [<EntryPoint>]
 let main argv =
@@ -9,6 +6,8 @@ let main argv =
     printfn "Please enter your commands to interact with the system."
     printfn "Press CTRL+C to stop the program."
     printf "> "
+
+    Directory.CreateDirectory("receipts") |> ignore;
 
     //example
     let cart = Domain.initCart()
