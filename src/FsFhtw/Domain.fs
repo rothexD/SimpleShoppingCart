@@ -94,24 +94,41 @@ let initCart(): Cart =
 
 // Payment functions
 let checkout (cart: Cart): Cart =
+    printf "(0) Paypal"
+    printf "(1) Credit Card"
     {
         States = cart.States;
         CheckoutInProgress = true;
         UserData = None;
         Credentials = None;
+        SelectedPaymentMethod = None;
     }
 
 let enterPersonalDetails (cart: Cart) (name: string) (address: string) (email: string): Cart =
     let userData = {Name=name;Address=address;Email=email}
-    {States=cart.States;CheckoutInProgress=cart.CheckoutInProgress;SelectedPaymentMethod=cart.SelectedPaymentMethod;UserData=Some(userData);Credentials=cart.Credentials}
+    {
+        States = cart.States
+        CheckoutInProgress = cart.CheckoutInProgress
+        SelectedPaymentMethod = cart.SelectedPaymentMethod
+        UserData = Some(userData)
+        Credentials = cart.Credentials
+    }
 
-let selectPaymentMethod (cart: Cart) (index: int) =
-    failwith ""
+let selectPaymentMethod (cart: Cart) (index: int): Cart =
+    {
+        States = cart.States;
+        CheckoutInProgress = cart.CheckoutInProgress;
+        UserData = cart.UserData;
+        Credentials = cart.Credentials;
+        SelectedPaymentMethod = Some (if index = 0 then "PayPal" else "Credit Card");
+    }
 
 // credential A is either username or credit card number
 // credential B is either password or CVV
 let pay (cart: Cart) (credentialA: string) (credentialB: string): Cart =
-    failwith ""
+    let sum = cart.States.Peek().Sum;
+    printf $"Payment of {sum}";
+    initCart();
 
 // Store functions
 let store = {Items = LoadItemsFromFile.loadItemsFromFile "ItemsInStore.txt"}
@@ -122,6 +139,7 @@ let GetItemByIndexerFromStore(index: int) : Option<Item> =
        None
     else
        Some store.Items[index]
+
 let GetItemByIndexerFromCart (cart:Cart) (index: int) : Option<Item> =
     if cart.States.Peek().Items.Count <= index || index < 0
     then
@@ -137,6 +155,7 @@ let VerifyCheckoutIsNotInProgress(cart :Cart) : bool=
     if(not cart.CheckoutInProgress) then true else
         printf "Cart Checkout is in progress, not a valid command"
         false
+
 // Message processing functions
 let update (msg : Message) (cart : Cart) : Cart =
     match msg with
