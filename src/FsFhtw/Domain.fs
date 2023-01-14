@@ -2,6 +2,7 @@ module Domain
 
 open System
 open System.Collections.Generic
+open System.IO
 open System.Reflection.Metadata
 open DomainModels
 open MessageTypes
@@ -123,12 +124,26 @@ let selectPaymentMethod (cart: Cart) (index: int): Cart =
         SelectedPaymentMethod = Some (if index = 0 then "PayPal" else "Credit Card");
     }
 
+let rec saveReceipt (cart: Cart): Guid =
+    let cartState = cart.States.Peek()
+    let itemList = cartState.Items |> Map.map (fun _ itemState ->
+        $"{itemState.Item.Name} ({itemState.Quantity}): {itemState.Item.Price * itemState.Quantity}")
+
+    let itemListString = String.Join (Environment.NewLine, itemList.Values)
+    let receipt = itemListString + Environment.NewLine + $"Total: {cartState.Sum}"
+
+    let shoppingId = Guid.NewGuid()
+    let fileName = $"receipt-{shoppingId}.txt"
+    File.WriteAllText (fileName, receipt)
+    shoppingId;
+
 // credential A is either username or credit card number
 // credential B is either password or CVV
 let pay (cart: Cart) (credentialA: string) (credentialB: string): Cart =
     let sum = cart.States.Peek().Sum;
-    printf $"Payment of {sum}";
-    initCart();
+    let shoppingId = saveReceipt cart
+    printf $""
+    initCart()
 
 // Store functions
 let store = {Items = LoadItemsFromFile.loadItemsFromFile "ItemsInStore.txt"}
