@@ -85,8 +85,10 @@ let initCart(): Cart =
             Items = Map<Guid, ItemState>([])
             Sum = decimal 0
         }]
+        CheckoutInProgress = false;
+        UserData = None
+        Credentials = None;
     }
-
 
 // Payment functions
 let checkout (cart: Cart): Cart =
