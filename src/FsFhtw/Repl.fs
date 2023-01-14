@@ -16,6 +16,10 @@ let read (input : string) =
     | SetQuantityInCart v -> MessageTypes.SetQuantity v  |> DomainMessage
     | Undo v -> MessageTypes.Undo v |> DomainMessage
     | ListStoreItems v -> MessageTypes.PrintStoreItems |> DomainMessage
+    | Checkout v -> MessageTypes.Checkout |> DomainMessage
+    | EnterPersonalDetails v -> MessageTypes.EnterPersonalDetails v |> DomainMessage
+    | SelectPaymentMethod v -> MessageTypes.SelectPaymentMethod v |> DomainMessage
+    | Pay v -> MessageTypes.Pay v |> DomainMessage
     | Help -> HelpRequested
     | ParseFailed  -> NotParsable input
 

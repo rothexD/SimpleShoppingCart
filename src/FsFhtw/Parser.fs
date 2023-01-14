@@ -31,3 +31,17 @@ let rec (|AddToCart|RemoveFromCart|SetQuantityInCart|Undo|ListStoreItems|Help|Pa
     | [ verb ] when safeEquals verb HelpLabel -> Help
     | [ verb ] when safeEquals verb (nameof MessageTypes.PrintStoreItems) -> ListStoreItems
     | _ -> ParseFailed
+
+let rec (|Checkout|EnterPersonalDetails|SelectPaymentMethod|Pay|ParseFailed|) (input : string) =
+    let tryParseInt (arg : string) valueConstructor =
+        let (worked, arg') = Int32.TryParse arg
+        if worked then valueConstructor arg' else ParseFailed
+
+    let parts = input.Split(' ') |> List.ofArray
+    match parts with
+    | [ verb; ] when safeEquals verb (nameof MessageTypes.Checkout) -> Checkout
+    | [ verb; arg1; arg2; arg3 ] when safeEquals verb (nameof MessageTypes.EnterPersonalDetails) -> EnterPersonalDetails (arg1, arg2, arg3)
+    | [ verb; arg; ] when safeEquals verb (nameof MessageTypes.SetQuantity) ->
+        tryParseInt arg (fun value-> SelectPaymentMethod value)
+    | [ verb; arg1; arg2 ] when safeEquals verb (nameof MessageTypes.Pay) -> Pay (arg1, arg2)
+    | _ -> ParseFailed

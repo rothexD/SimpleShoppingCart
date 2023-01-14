@@ -11,3 +11,7 @@ type Message =
     | SetQuantity of int * int
     | Undo of int
     | PrintStoreItems
+    | Checkout
+    | EnterPersonalDetails of string * string * string
+    | SelectPaymentMethod of int
+    | Pay of string * string

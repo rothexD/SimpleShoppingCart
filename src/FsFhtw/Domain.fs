@@ -87,6 +87,22 @@ let initCart(): Cart =
         }]
     }
 
+
+// Payment functions
+let checkout (cart: Cart): Cart =
+    failwith ""
+
+let enterPersonalDetails (cart: Cart) (name: string) (address: string) (email: string): Cart =
+    failwith ""
+
+let selectPaymentMethod (cart: Cart) (index: int) =
+    failwith ""
+
+// credential A is either username or credit card number
+// credential B is either password or CVV
+let pay (cart: Cart) (credentialA: string) (credentialB: string): Cart =
+    failwith ""
+
 // Store functions
 let store = {Items = LoadItemsFromFile.loadItemsFromFile "ItemsInStore.txt"}
 
@@ -103,6 +119,7 @@ let GetItemByIndexerFromCart (cart:Cart) (index: int) : Option<Item> =
     else
         Some (List.ofSeq(cart.States.Peek().Items)[index]).Value.Item
 
+
 // Message processing functions
 let update (msg : Message) (cart : Cart) : Cart =
     match msg with
@@ -111,3 +128,19 @@ let update (msg : Message) (cart : Cart) : Cart =
     | SetQuantity (x,y) -> setQuantityInCart cart (GetItemByIndexerFromCart cart x) (decimal y)
     | Undo steps -> undoCartActions cart (decimal steps)
     | PrintStoreItems -> printItemsInStore store cart
+    | Checkout -> checkout cart
+    | EnterPersonalDetails (name, address, email) -> enterPersonalDetails cart name address email
+    | SelectPaymentMethod index -> selectPaymentMethod cart index
+    | Pay (credentialA, credentialB) -> pay cart credentialA credentialB
+
+type Message =
+    | Add of int * int
+    | Remove of int
+    | SetQuantity of int * int
+    | Undo of int
+    | PrintStoreItems
+    | Checkout
+    | EnterPersonalDetails of string * string * string
+    | SelectPaymentMethod of int
+    | Pay of string * string
+
