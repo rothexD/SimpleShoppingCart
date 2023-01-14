@@ -86,7 +86,8 @@ let initCart(): Cart =
             Items = Map<Guid, ItemState>([])
             Sum = decimal 0
         }]
-        CheckoutInProgress = false;
+        CheckoutInProgress = false
+        SelectedPaymentMethod = None;
         UserData = None
         Credentials = None;
     }
@@ -101,7 +102,8 @@ let checkout (cart: Cart): Cart =
     }
 
 let enterPersonalDetails (cart: Cart) (name: string) (address: string) (email: string): Cart =
-    failwith ""
+    let userData = {Name=name;Address=address;Email=email}
+    {States=cart.States;CheckoutInProgress=cart.CheckoutInProgress;SelectedPaymentMethod=cart.SelectedPaymentMethod;UserData=Some(userData);Credentials=cart.Credentials}
 
 let selectPaymentMethod (cart: Cart) (index: int) =
     failwith ""
