@@ -16,3 +16,4 @@ type Message =
     | SelectPaymentMethod of int
     | Pay of string * string
     | PrintCart
+    | StopCheckout

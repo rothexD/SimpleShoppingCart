@@ -22,7 +22,8 @@ let read (input : string) =
     | Pay v -> MessageTypes.Pay v |> DomainMessage
     | Help -> HelpRequested
     | ParseFailed  -> NotParsable input
-    | PrintCart v -> MessageTypes.PrintCart |> DomainMessage
+    | PrintCart  -> MessageTypes.PrintCart |> DomainMessage
+    | StopCheckout  -> MessageTypes.StopCheckout |> DomainMessage
 
 
 open Microsoft.FSharp.Reflection
@@ -50,16 +51,20 @@ let createHelpText (cart: Cart) : string =
                          "\tCheckout"
                 else if cart.UserData.IsNone
                     then "\tEnterPersonalDetails <Name> <Address> <Email>" + Environment.NewLine +
+                         "\tStopCheckout" + Environment.NewLine +
                          "\tPrintCart"
                 else if cart.SelectedPaymentMethod.IsNone
                     then "\tSelectPaymentMethod <PaymentMethod-Number>" + Environment.NewLine +
                          "\t\t(0) PayPal" + Environment.NewLine +
                          "\t\t(1) CreditCard" + Environment.NewLine +
+                         "\tStopCheckout" + Environment.NewLine +
                          "\tPrintCart"
-                else if cart.SelectedPaymentMethod.Value.ToLower() = "PayPal"
+                else if cart.SelectedPaymentMethod.Value = "PayPal"
                     then "\tpay <username> <password>" + Environment.NewLine +
+                         "\tStopCheckout" + Environment.NewLine +
                          "\tPrintCart"
                 else "\tpay <credit-card-number> <cvv>" + Environment.NewLine +
+                         "\tStopCheckout" + Environment.NewLine +
                          "\tPrintCart"
     header + Environment.NewLine + context + Environment.NewLine+ body
 

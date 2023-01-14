@@ -46,8 +46,9 @@ let rec (|Checkout|EnterPersonalDetails|SelectPaymentMethod|Pay|ParseFailed|) (i
     | [ verb; arg1; arg2 ] when safeEquals verb (nameof MessageTypes.Pay) -> Pay (arg1, arg2)
     | _ -> ParseFailed
 
-let rec (|PrintCart|ParseFailed|) (input : string) =
+let rec (|PrintCart|ParseFailed|StopCheckout|) (input : string) =
     let parts = input.Split(' ') |> List.ofArray
     match parts with
     | [ verb; ] when safeEquals verb (nameof MessageTypes.PrintCart) -> PrintCart
+    | [ verb; ] when safeEquals verb (nameof MessageTypes.StopCheckout) -> StopCheckout
     | _ -> ParseFailed

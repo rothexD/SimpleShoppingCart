@@ -235,6 +235,15 @@ let PrintCart (cart : Cart) : Cart =
     printf $"{cartToString cart}"
     cart
 
+let stopCheckout(cart: Cart):Cart=
+    {
+        States = cart.States;
+        CheckoutInProgress = false;
+        UserData = None;
+        Credentials = None;
+        SelectedPaymentMethod = None;
+    }
+
 let update (msg : Message) (cart : Cart) : Cart =
     match msg with
     | Add (x,y) ->
@@ -248,4 +257,5 @@ let update (msg : Message) (cart : Cart) : Cart =
     | SelectPaymentMethod index -> if VerifySelectPaymentMethodIsValid cart then selectPaymentMethod cart index else cart
     | Pay (credentialA, credentialB) -> if VerifyPaymentIsValid cart then pay cart credentialA credentialB else cart
     | PrintCart -> PrintCart cart
+    | StopCheckout -> if VerifyCheckoutIsInProgress cart then stopCheckout cart else cart
 
