@@ -13,7 +13,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FsFhtw.Tests", "test\FsFhtw
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Types", "src\Types\Types.fsproj", "{A4A60C6D-536E-487B-8F45-26DAAA9AE545}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ImportFromFile", "src\ImportFromFile\ImportFromFile.fsproj", "{E4C15BA7-013A-4A17-925E-2FE8AFABBC1C}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ImportExportServices", "src\ImportExportServices\ImportExportServices.fsproj", "{E4C15BA7-013A-4A17-925E-2FE8AFABBC1C}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Resources", "src\Resources\Resources.fsproj", "{90A1CB57-7BC4-45DE-859B-0829B74A766E}"
 EndProject

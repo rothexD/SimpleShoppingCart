@@ -129,19 +129,27 @@ let GetItemByIndexerFromCart (cart:Cart) (index: int) : Option<Item> =
     else
         Some (List.ofSeq(cart.States.Peek().Items)[index]).Value.Item
 
-
+let VerifyCheckoutIsInProgress(cart :Cart) : bool=
+    if(cart.CheckoutInProgress) then true else
+        printf "Cart Checkout is not in progress, not a valid command"
+        false
+let VerifyCheckoutIsNotInProgress(cart :Cart) : bool=
+    if(not cart.CheckoutInProgress) then true else
+        printf "Cart Checkout is in progress, not a valid command"
+        false
 // Message processing functions
 let update (msg : Message) (cart : Cart) : Cart =
     match msg with
-    | Add (x,y) -> addToCart cart (GetItemByIndexerFromStore x) (decimal y)
-    | Remove x -> removeFromCart cart (GetItemByIndexerFromCart cart x)
-    | SetQuantity (x,y) -> setQuantityInCart cart (GetItemByIndexerFromCart cart x) (decimal y)
-    | Undo steps -> undoCartActions cart (decimal steps)
-    | PrintStoreItems -> printItemsInStore store cart
-    | Checkout -> checkout cart
-    | EnterPersonalDetails (name, address, email) -> enterPersonalDetails cart name address email
-    | SelectPaymentMethod index -> selectPaymentMethod cart index
-    | Pay (credentialA, credentialB) -> pay cart credentialA credentialB
+    | Add (x,y) ->
+        if VerifyCheckoutIsNotInProgress cart then cart else addToCart cart (GetItemByIndexerFromStore x) (decimal y)
+    | Remove x -> if VerifyCheckoutIsNotInProgress cart then cart else removeFromCart cart (GetItemByIndexerFromCart cart x)
+    | SetQuantity (x,y) -> if VerifyCheckoutIsNotInProgress cart then cart else setQuantityInCart cart (GetItemByIndexerFromCart cart x) (decimal y)
+    | Undo steps -> if VerifyCheckoutIsNotInProgress cart then cart else undoCartActions cart (decimal steps)
+    | PrintStoreItems -> if VerifyCheckoutIsNotInProgress cart then cart else printItemsInStore store cart
+    | Checkout -> if VerifyCheckoutIsNotInProgress cart then cart else checkout cart
+    | EnterPersonalDetails (name, address, email) -> if VerifyCheckoutIsInProgress cart then cart else enterPersonalDetails cart name address email
+    | SelectPaymentMethod index -> if VerifyCheckoutIsInProgress cart then cart else selectPaymentMethod cart index
+    | Pay (credentialA, credentialB) -> if VerifyCheckoutIsInProgress cart then cart else pay cart credentialA credentialB
 
 type Message =
     | Add of int * int

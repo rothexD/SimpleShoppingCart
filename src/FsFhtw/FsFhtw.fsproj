@@ -10,7 +10,7 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ImportFromFile\ImportFromFile.fsproj" />
+    <ProjectReference Include="..\ImportExportServices\ImportExportServices.fsproj" />
     <ProjectReference Include="..\Resources\Resources.fsproj" />
   </ItemGroup>
 </Project>
