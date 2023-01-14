@@ -94,8 +94,6 @@ let initCart(): Cart =
 
 // Payment functions
 let checkout (cart: Cart): Cart =
-    printf "(0) Paypal"
-    printf "(1) Credit Card"
     {
         States = cart.States;
         CheckoutInProgress = true;
@@ -105,6 +103,8 @@ let checkout (cart: Cart): Cart =
     }
 
 let enterPersonalDetails (cart: Cart) (name: string) (address: string) (email: string): Cart =
+    printf "(0) Paypal"
+    printf "(1) Credit Card"
     let userData = {Name=name;Address=address;Email=email}
     {
         States = cart.States
@@ -156,6 +156,47 @@ let VerifyCheckoutIsNotInProgress(cart :Cart) : bool=
         printf "Cart Checkout is in progress, not a valid command"
         false
 
+let VerifyCheckoutIsValid (cart: Cart): bool =
+    let cartState = cart.States.Peek()
+    if (cartState.Items.Count = 0) then
+        printf "Can't perform checkout as cart is empty"
+        false
+    else
+        true;
+
+let VerifyEnterPersonalDetailsIValid (cart: Cart): bool =
+    if cart.CheckoutInProgress = false then
+        printf "To enter your personal details, you have to first enter checkout"
+        false
+    else if not (cart.UserData = None) then
+        printf "You already entered your personal details"
+        false
+    else
+        true
+
+let VerifySelectPaymentMethodIsValid (cart: Cart): bool =
+    if (not cart.CheckoutInProgress) then
+        printf "To perform a payment, you have to first enter checkout"
+        false
+    else if (cart.UserData = None) then
+        printf "To select a payment method, you have to first enter your personal details"
+        false
+    else
+        true
+
+let VerifyPaymentIsValid (cart: Cart): bool =
+    if (not cart.CheckoutInProgress) then
+        printf "To perform a payment, you have to first enter checkout"
+        false
+    else if (cart.UserData = None) then
+        printf "To perform a payment, you have to first enter your personal details"
+        false
+    else if (cart.SelectedPaymentMethod = None) then
+        printf "To perform a payment, you have to select a payment method"
+        false
+    else
+        true
+
 // Message processing functions
 let update (msg : Message) (cart : Cart) : Cart =
     match msg with
@@ -165,10 +206,10 @@ let update (msg : Message) (cart : Cart) : Cart =
     | SetQuantity (x,y) -> if VerifyCheckoutIsNotInProgress cart then cart else setQuantityInCart cart (GetItemByIndexerFromCart cart x) (decimal y)
     | Undo steps -> if VerifyCheckoutIsNotInProgress cart then cart else undoCartActions cart (decimal steps)
     | PrintStoreItems -> if VerifyCheckoutIsNotInProgress cart then cart else printItemsInStore store cart
-    | Checkout -> if VerifyCheckoutIsNotInProgress cart then cart else checkout cart
-    | EnterPersonalDetails (name, address, email) -> if VerifyCheckoutIsInProgress cart then cart else enterPersonalDetails cart name address email
-    | SelectPaymentMethod index -> if VerifyCheckoutIsInProgress cart then cart else selectPaymentMethod cart index
-    | Pay (credentialA, credentialB) -> if VerifyCheckoutIsInProgress cart then cart else pay cart credentialA credentialB
+    | Checkout -> if VerifyCheckoutIsValid cart then cart else checkout cart
+    | EnterPersonalDetails (name, address, email) -> if VerifyEnterPersonalDetailsIValid cart then cart else enterPersonalDetails cart name address email
+    | SelectPaymentMethod index -> if VerifySelectPaymentMethodIsValid cart then cart else selectPaymentMethod cart index
+    | Pay (credentialA, credentialB) -> if VerifyPaymentIsValid cart then cart else pay cart credentialA credentialB
 
 type Message =
     | Add of int * int
