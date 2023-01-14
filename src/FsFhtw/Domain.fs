@@ -135,14 +135,20 @@ let selectPaymentMethod (cart: Cart) (index: int): Cart =
 
 let rec saveReceipt (cart: Cart): Guid =
     let cartState = cart.States.Peek()
+    let shoppingId = Guid.NewGuid()
+    let shoppingIdString = $"{shoppingId}";
+    let fileName = $"receipts/receipt-{shoppingId}.txt"
+
     let itemList = cartState.Items |> Map.map (fun _ itemState ->
         $"{itemState.Item.Name} ({itemState.Quantity}): {itemState.Item.Price * itemState.Quantity}")
 
-    let shoppingId = Guid.NewGuid()
-    let fileName = $"receipts/receipt-{shoppingId}.txt"
-    let shoppingIdString = $"{shoppingId}";
-    let itemListString = String.Join (Environment.NewLine, itemList.Values)
-    let receipt = shoppingIdString + Environment.NewLine + itemListString + Environment.NewLine + $"Total: {cartState.Sum}"
+    let receipt = shoppingIdString + Environment.NewLine
+                  + "Name: " + cart.UserData.Value.Name + Environment.NewLine
+                  + "Address: " + cart.UserData.Value.Address + Environment.NewLine
+                  + "Email: " + cart.UserData.Value.Email + Environment.NewLine
+                  + "Items: " + Environment.NewLine
+                  + String.Join (Environment.NewLine, itemList.Values) + Environment.NewLine
+                  + $"Total: {cartState.Sum}"
 
     File.WriteAllText (fileName, receipt)
     shoppingId;
