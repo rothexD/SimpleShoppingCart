@@ -198,6 +198,21 @@ let VerifyPaymentIsValid (cart: Cart): bool =
         true
 
 // Message processing functions
+
+let itemStateToString (state: ItemState) (index: int): string =
+    $"{index}\t{state.Item.Name}\t\t\t{state.Item.Price}$\t({state.Quantity}){Environment.NewLine}"
+
+let cartToString (cart: Cart): string =
+    let state = cart.States.Peek()
+    let headerLines = $"Index\tName\t\t\tPrice\tQuantity{Environment.NewLine}";
+    let strings = state.Items |> Map.toList |> List.mapi (fun index (_, itemState) -> itemStateToString itemState index)
+    let sumString = [$"Total: {state.Sum}$"]
+    String.Join(Environment.NewLine, (headerLines :: strings) @ sumString)
+
+let PrintCart (cart : Cart) : Cart =
+    printf $"{cartToString cart}"
+    cart
+
 let update (msg : Message) (cart : Cart) : Cart =
     match msg with
     | Add (x,y) ->
@@ -210,15 +225,5 @@ let update (msg : Message) (cart : Cart) : Cart =
     | EnterPersonalDetails (name, address, email) -> if VerifyEnterPersonalDetailsIValid cart then cart else enterPersonalDetails cart name address email
     | SelectPaymentMethod index -> if VerifySelectPaymentMethodIsValid cart then cart else selectPaymentMethod cart index
     | Pay (credentialA, credentialB) -> if VerifyPaymentIsValid cart then cart else pay cart credentialA credentialB
-
-type Message =
-    | Add of int * int
-    | Remove of int
-    | SetQuantity of int * int
-    | Undo of int
-    | PrintStoreItems
-    | Checkout
-    | EnterPersonalDetails of string * string * string
-    | SelectPaymentMethod of int
-    | Pay of string * string
+    | PrintCart -> PrintCart cart
 
