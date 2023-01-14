@@ -115,8 +115,6 @@ let checkout (cart: Cart): Cart =
     }
 
 let enterPersonalDetails (cart: Cart) (name: string) (address: string) (email: string): Cart =
-    printf "(0) Paypal"
-    printf "(1) Credit Card"
     let userData = {Name=name;Address=address;Email=email}
     {
         States = cart.States
@@ -141,7 +139,7 @@ let rec saveReceipt (cart: Cart): Guid =
         $"{itemState.Item.Name} ({itemState.Quantity}): {itemState.Item.Price * itemState.Quantity}")
 
     let shoppingId = Guid.NewGuid()
-    let fileName = $"receipt-{shoppingId}.txt"
+    let fileName = $"receipts/receipt-{shoppingId}.txt"
     let shoppingIdString = $"{shoppingId}";
     let itemListString = String.Join (Environment.NewLine, itemList.Values)
     let receipt = shoppingIdString + Environment.NewLine + itemListString + Environment.NewLine + $"Total: {cartState.Sum}"
@@ -153,7 +151,7 @@ let rec saveReceipt (cart: Cart): Guid =
 // credential B is either password or CVV
 let pay (cart: Cart) (credentialA: string) (credentialB: string): Cart =
     let shoppingId = saveReceipt cart
-    printf $"Saved receipt, shopping id is {shoppingId}"
+    printf $"Saved receipt, shopping id is {shoppingId}{Environment.NewLine}"
     let cartString = cartToString(cart)
     printf $"{cartString}";
     initCart()
@@ -177,50 +175,50 @@ let GetItemByIndexerFromCart (cart:Cart) (index: int) : Option<Item> =
 
 let VerifyCheckoutIsInProgress(cart :Cart) : bool=
     if(cart.CheckoutInProgress) then true else
-        printf "Cart Checkout is not in progress, not a valid command"
+        printf $"Cart Checkout is not in progress, not a valid command{Environment.NewLine}"
         false
 let VerifyCheckoutIsNotInProgress(cart :Cart) : bool=
     if(not cart.CheckoutInProgress) then true else
-        printf "Cart Checkout is in progress, not a valid command"
+        printf $"Cart Checkout is in progress, not a valid command{Environment.NewLine}"
         false
 
 let VerifyCheckoutIsValid (cart: Cart): bool =
     let cartState = cart.States.Peek()
     if (cartState.Items.Count = 0) then
-        printf "Can't perform checkout as cart is empty"
+        printf $"Can't perform checkout as cart is empty{Environment.NewLine}"
         false
     else
         true;
 
 let VerifyEnterPersonalDetailsIValid (cart: Cart): bool =
     if cart.CheckoutInProgress = false then
-        printf "To enter your personal details, you have to first enter checkout"
+        printf $"To enter your personal details, you have to first enter checkout{Environment.NewLine}"
         false
     else if not (cart.UserData = None) then
-        printf "You already entered your personal details"
+        printf $"You already entered your personal details{Environment.NewLine}"
         false
     else
         true
 
 let VerifySelectPaymentMethodIsValid (cart: Cart): bool =
     if (not cart.CheckoutInProgress) then
-        printf "To perform a payment, you have to first enter checkout"
+        printf $"To perform a payment, you have to first enter checkout{Environment.NewLine}"
         false
     else if (cart.UserData = None) then
-        printf "To select a payment method, you have to first enter your personal details"
+        printf $"To select a payment method, you have to first enter your personal details{Environment.NewLine}"
         false
     else
         true
 
 let VerifyPaymentIsValid (cart: Cart): bool =
     if (not cart.CheckoutInProgress) then
-        printf "To perform a payment, you have to first enter checkout"
+        printf $"To perform a payment, you have to first enter checkout{Environment.NewLine}"
         false
     else if (cart.UserData = None) then
-        printf "To perform a payment, you have to first enter your personal details"
+        printf $"To perform a payment, you have to first enter your personal details{Environment.NewLine}"
         false
     else if (cart.SelectedPaymentMethod = None) then
-        printf "To perform a payment, you have to select a payment method"
+        printf $"To perform a payment, you have to select a payment method{Environment.NewLine}"
         false
     else
         true
@@ -234,14 +232,14 @@ let PrintCart (cart : Cart) : Cart =
 let update (msg : Message) (cart : Cart) : Cart =
     match msg with
     | Add (x,y) ->
-        if VerifyCheckoutIsNotInProgress cart then cart else addToCart cart (GetItemByIndexerFromStore x) (decimal y)
-    | Remove x -> if VerifyCheckoutIsNotInProgress cart then cart else removeFromCart cart (GetItemByIndexerFromCart cart x)
-    | SetQuantity (x,y) -> if VerifyCheckoutIsNotInProgress cart then cart else setQuantityInCart cart (GetItemByIndexerFromCart cart x) (decimal y)
-    | Undo steps -> if VerifyCheckoutIsNotInProgress cart then cart else undoCartActions cart (decimal steps)
-    | PrintStoreItems -> if VerifyCheckoutIsNotInProgress cart then cart else printItemsInStore store cart
-    | Checkout -> if VerifyCheckoutIsValid cart then cart else checkout cart
-    | EnterPersonalDetails (name, address, email) -> if VerifyEnterPersonalDetailsIValid cart then cart else enterPersonalDetails cart name address email
-    | SelectPaymentMethod index -> if VerifySelectPaymentMethodIsValid cart then cart else selectPaymentMethod cart index
-    | Pay (credentialA, credentialB) -> if VerifyPaymentIsValid cart then cart else pay cart credentialA credentialB
+        if VerifyCheckoutIsNotInProgress cart then addToCart cart (GetItemByIndexerFromStore x) (decimal y) else cart
+    | Remove x -> if VerifyCheckoutIsNotInProgress cart then removeFromCart cart (GetItemByIndexerFromCart cart x) else cart
+    | SetQuantity (x,y) -> if VerifyCheckoutIsNotInProgress cart then setQuantityInCart cart (GetItemByIndexerFromCart cart x) (decimal y) else cart
+    | Undo steps -> if VerifyCheckoutIsNotInProgress cart then undoCartActions cart (decimal steps) else cart
+    | PrintStoreItems -> if VerifyCheckoutIsNotInProgress cart then printItemsInStore store cart else cart
+    | Checkout -> if VerifyCheckoutIsValid cart then checkout cart else cart
+    | EnterPersonalDetails (name, address, email) -> if VerifyEnterPersonalDetailsIValid cart then enterPersonalDetails cart name address email else cart
+    | SelectPaymentMethod index -> if VerifySelectPaymentMethodIsValid cart then selectPaymentMethod cart index else cart
+    | Pay (credentialA, credentialB) -> if VerifyPaymentIsValid cart then pay cart credentialA credentialB else cart
     | PrintCart -> PrintCart cart
 

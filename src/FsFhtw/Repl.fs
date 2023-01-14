@@ -67,7 +67,7 @@ let evaluate (update : MessageTypes.Message -> Cart -> Cart) (cart : Cart) (msg 
     match msg with
     | DomainMessage msg ->
         let newCart = update msg cart
-        let message = $"{Environment.NewLine}{Environment.NewLine}The message was {msg}.{Environment.NewLine}Cart content: {Environment.NewLine}"
+        let message = $"{Environment.NewLine}{Environment.NewLine}The message was {msg}"
         (newCart, message)
     | HelpRequested ->
         let message = createHelpText (cart)

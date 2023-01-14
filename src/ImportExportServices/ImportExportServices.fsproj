@@ -12,7 +12,6 @@
 
     <ItemGroup>
       <Compile Include="LoadItemsFromFile.fs" />
-      <Compile Include="PersistReceipt.fs" />
     </ItemGroup>
 
 </Project>

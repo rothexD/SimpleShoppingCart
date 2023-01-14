@@ -41,7 +41,7 @@ let rec (|Checkout|EnterPersonalDetails|SelectPaymentMethod|Pay|ParseFailed|) (i
     match parts with
     | [ verb; ] when safeEquals verb (nameof MessageTypes.Checkout) -> Checkout
     | [ verb; arg1; arg2; arg3 ] when safeEquals verb (nameof MessageTypes.EnterPersonalDetails) -> EnterPersonalDetails (arg1, arg2, arg3)
-    | [ verb; arg; ] when safeEquals verb (nameof MessageTypes.SetQuantity) ->
+    | [ verb; arg; ] when safeEquals verb (nameof MessageTypes.SelectPaymentMethod) ->
         tryParseInt arg (fun value-> SelectPaymentMethod value)
     | [ verb; arg1; arg2 ] when safeEquals verb (nameof MessageTypes.Pay) -> Pay (arg1, arg2)
     | _ -> ParseFailed
