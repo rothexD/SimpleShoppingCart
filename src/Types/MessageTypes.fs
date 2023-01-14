@@ -15,3 +15,4 @@ type Message =
     | EnterPersonalDetails of string * string * string
     | SelectPaymentMethod of int
     | Pay of string * string
+    | PrintCart
